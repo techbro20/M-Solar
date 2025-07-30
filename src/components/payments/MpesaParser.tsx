@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Payment } from '../../../types/Payment';
+import { Payment } from '../../types/Payment';
 
 
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Client } from '../../types/Client';
+import ClientForm from './ClientForm';
 
 interface ClientDetailsProps {
   client: Client;
