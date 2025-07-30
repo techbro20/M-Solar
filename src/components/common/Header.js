@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
 import { Menu, X, User, LogOut, Settings } from 'lucide-react';
 
-const Header = ({ activeTab, setActiveTab }) => {
+const Header = ({
+  activeTab,
+  setActiveTab,
+  isAuthenticated,
+  onLoginClick,
+  onLogoutClick,
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const navItems = [
     { id: 'home', label: 'Home', path: '/' },
-    { id: 'clients', label: 'Clients', path: '/clients' },
     { id: 'products', label: 'Products', path: '/products' },
-    { id: 'payments', label: 'Payments', path: '/payments' }
+  ];
+
+  const adminItems = [
+    { id: 'clients', label: 'Clients', path: '/clients' },
+    { id: 'payments', label: 'Payments', path: '/payments' },
+    { id: 'dashboard', label: 'Dashboard', path: '/dashboard' }, // moved to last
   ];
 
   return (
@@ -42,32 +52,59 @@ const Header = ({ activeTab, setActiveTab }) => {
                 {item.label}
               </button>
             ))}
+
+            {isAuthenticated &&
+              adminItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`text-lg font-medium transition-colors duration-200 ${
+                    activeTab === item.id
+                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1'
+                      : 'text-white hover:text-orange-400'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
           </nav>
 
           {/* Desktop User Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <div className="relative">
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors"
+                >
+                  <User size={20} />
+                  <span>Admin</span>
+                </button>
+
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl py-2 z-50">
+                    <button className="w-full text-left px-4 py-2 text-white hover:bg-gray-700 flex items-center space-x-2">
+                      <Settings size={16} />
+                      <span>Settings</span>
+                    </button>
+                    <button
+                      onClick={onLogoutClick}
+                      className="w-full text-left px-4 py-2 text-white hover:bg-gray-700 flex items-center space-x-2"
+                    >
+                      <LogOut size={16} />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
               <button
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors"
+                onClick={onLoginClick}
+                className="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-md text-white font-medium"
               >
-                <User size={20} />
-                <span>Admin</span>
+                Admin Login
               </button>
-              
-              {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl py-2 z-50">
-                  <button className="w-full text-left px-4 py-2 text-white hover:bg-gray-700 flex items-center space-x-2">
-                    <Settings size={16} />
-                    <span>Settings</span>
-                  </button>
-                  <button className="w-full text-left px-4 py-2 text-white hover:bg-gray-700 flex items-center space-x-2">
-                    <LogOut size={16} />
-                    <span>Logout</span>
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -99,16 +136,48 @@ const Header = ({ activeTab, setActiveTab }) => {
                   {item.label}
                 </button>
               ))}
-              <div className="border-t border-gray-700 pt-4">
-                <button className="w-full text-left text-white hover:text-orange-400 flex items-center space-x-2">
-                  <Settings size={16} />
-                  <span>Settings</span>
+              {isAuthenticated && (
+                <>
+                  {adminItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setIsMenuOpen(false);
+                      }}
+                      className={`text-left font-medium transition-colors duration-200 ${
+                        activeTab === item.id
+                          ? 'text-orange-500'
+                          : 'text-white hover:text-orange-400'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                  <div className="border-t border-gray-700 pt-4">
+                    <button className="w-full text-left text-white hover:text-orange-400 flex items-center space-x-2">
+                      <Settings size={16} />
+                      <span>Settings</span>
+                    </button>
+                    <button
+                      onClick={onLogoutClick}
+                      className="w-full text-left text-white hover:text-orange-400 flex items-center space-x-2 mt-2"
+                    >
+                      <LogOut size={16} />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                </>
+              )}
+              {!isAuthenticated && (
+                <button
+                  onClick={onLoginClick}
+                  className="w-full text-left text-white hover:text-orange-400 flex items-center space-x-2 mt-4"
+                >
+                  <User size={16} />
+                  <span>Admin Login</span>
                 </button>
-                <button className="w-full text-left text-white hover:text-orange-400 flex items-center space-x-2 mt-2">
-                  <LogOut size={16} />
-                  <span>Logout</span>
-                </button>
-              </div>
+              )}
             </nav>
           </div>
         )}
